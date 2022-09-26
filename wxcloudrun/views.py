@@ -33,10 +33,9 @@ def login(request, _):
         # userinfo = json. loads(response.text)
         # userinfo["sc"] = body["sc"]
         # print(userinfo)
-        # openid = request.META["X-WX-OPENID"]
-        # userinfo = json.loads('{"a":1}')
-        # userinfo['openid'] = openid
-        return HttpResponse(request.META)
+        openid = request.META["HTTP_X_WX_OPENID"]
+        appid = request.META["HTTP_X_WX_APPID"]
+        return HttpResponse(openid + "|" + appid)
     else:
         return HttpResponse("Error call method.", status=200)
 
