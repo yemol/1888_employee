@@ -1,5 +1,7 @@
+
 import json
 import logging
+import requests
 
 from django.http import JsonResponse
 from django.shortcuts import render
@@ -17,6 +19,13 @@ def index(request, _):
     """
 
     return render(request, 'index.html')
+
+
+def login(request, _):
+    response = requests.get("http://api.weixin.qq.com/wxa/getwxadevinfo")
+    userinfo = json. loads(response.text)
+    print(userinfo["errcode"])
+    return JsonResponse(userinfo,safe=False)
 
 
 def counter(request, _):
