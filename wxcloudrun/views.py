@@ -24,7 +24,7 @@ def index(request, _):
 def login(request, _):
     response = requests.get("http://api.weixin.qq.com/wxa/getwxadevinfo")
     userinfo = json. loads(response.text)
-    print(userinfo["errcode"])
+    # print(userinfo)
     return JsonResponse(userinfo,safe=False)
 
 
