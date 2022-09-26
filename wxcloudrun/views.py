@@ -5,6 +5,7 @@ import requests
 
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.http import HttpResponse 
 from wxcloudrun.models import Counters
 
 
@@ -24,14 +25,17 @@ def index(request, _):
 
 
 def login(request, _):
-    body_unicode = request.body.decode('utf-8')
-    body = json.loads(body_unicode)
-    # response = requests.get("http://api.weixin.qq.com/wxa/getwxadevinfo")
-    response = requests.get("http://api.weixin.qq.com/sns/jscode2session?appid=wxb5a2d9bf5b4aae47&secret=".body["sc"])
-    userinfo = json. loads(response.text)
-    userinfo["sc"] = body["sc"]
-    # print(userinfo)
-    return JsonResponse(userinfo,safe=False)
+    if request.method == 'POST' or request.method == 'post':
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+        # response = requests.get("http://api.weixin.qq.com/wxa/getwxadevinfo")
+        response = requests.get("http://api.weixin.qq.com/sns/jscode2session?appid=wxb5a2d9bf5b4aae47&secret=".body["sc"])
+        userinfo = json. loads(response.text)
+        userinfo["sc"] = body["sc"]
+        # print(userinfo)
+        return JsonResponse(userinfo,safe=False)
+    else:
+        return HttpResponse("Error call method.", status=200)
 
 
 def counter(request, _):
