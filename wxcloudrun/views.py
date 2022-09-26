@@ -25,17 +25,22 @@ def index(request, _):
 
 
 def login(request, _):
+
+    #需要使用post，才会附加所需要的用户标识等信息
     if request.method == 'POST' or request.method == 'post':
         body_unicode = request.body.decode('utf-8')
         body = json.loads(body_unicode)
-        # response = requests.post("http://api.weixin.qq.com/wxa/business/getuserphonenumber")
-        # response = requests.get("http://api.weixin.qq.com/sns/jscode2session?appid=wxb5a2d9bf5b4aae47&secret=" + body["sc"])
-        # userinfo = json. loads(response.text)
-        # userinfo["sc"] = body["sc"]
-        # print(userinfo)
-        openid = request.META["HTTP_X_WX_OPENID"]
+        
+        #获取OpenID，使用post数据的原因是便于本地调试
+        if body["openid"] is None :
+            openid = request.META["HTTP_X_WX_OPENID"]
+        else: 
+            openid =  body["nickName"]
+        #获取AppID
         appid = request.META["HTTP_X_WX_APPID"]
+        #获取昵称，数据来自小程序
         nickName = body["nickName"]
+        
         return HttpResponse(openid + "|" + appid + "|" + nickName, status=200)
     else:
         return HttpResponse("Error call method.", status=200)
