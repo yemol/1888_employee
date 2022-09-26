@@ -8,6 +8,8 @@ from django.shortcuts import render
 from wxcloudrun.models import Counters
 
 
+
+
 logger = logging.getLogger('log')
 
 
@@ -22,7 +24,8 @@ def index(request, _):
 
 
 def login(request, _):
-    response = requests.get("http://api.weixin.qq.com/wxa/getwxadevinfo")
+    # response = requests.get("http://api.weixin.qq.com/wxa/getwxadevinfo")
+    response = requests.get("https://api.weixin.qq.com/sns/jscode2session")
     userinfo = json. loads(response.text)
     # print(userinfo)
     return JsonResponse(userinfo,safe=False)
