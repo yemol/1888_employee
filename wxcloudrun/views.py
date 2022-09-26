@@ -28,14 +28,14 @@ def login(request, _):
     if request.method == 'POST' or request.method == 'post':
         # body_unicode = request.body.decode('utf-8')
         # body = json.loads(body_unicode)
-        # response = requests.get("http://api.weixin.qq.com/wxa/getwxadevinfo")
+        response = requests.get("api.weixin.qq.com/wxa/business/getuserphonenumber")
         # response = requests.get("http://api.weixin.qq.com/sns/jscode2session?appid=wxb5a2d9bf5b4aae47&secret=" + body["sc"])
         # userinfo = json. loads(response.text)
         # userinfo["sc"] = body["sc"]
         # print(userinfo)
         openid = request.META["HTTP_X_WX_OPENID"]
         appid = request.META["HTTP_X_WX_APPID"]
-        return HttpResponse(openid + "|" + appid)
+        return HttpResponse(openid + "|" + appid + "|" + response.text, status=200)
     else:
         return HttpResponse("Error call method.", status=200)
 
