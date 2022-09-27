@@ -37,12 +37,12 @@ def login(request, _):
         if "openid"  in body.keys() :
             c_openid =  body["openid"]
         else: 
-            c_openid = request.META["HTTP_X_WX_OPENID"]
+            c_openid = request.META["HTTP_X_WX_FROM_OPENID"]
         #获取AppID
         if "appid"  in body.keys() :
             c_appid =  body["appid"]
         else: 
-            c_appid = request.META["HTTP_X_WX_APPID"]
+            c_appid = request.META["HTTP_X_WX_FROM_APPID"]
         #获取昵称，数据来自小程序
         c_nickName = body["nickName"]
         
