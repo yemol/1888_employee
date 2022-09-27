@@ -1,4 +1,5 @@
 
+from datetime import datetime
 import json
 import logging
 import requests
@@ -7,9 +8,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.http import HttpResponse 
 from wxcloudrun.models import Counters
-
-
-
+from wxcloudrun.models import Users
 
 logger = logging.getLogger('log')
 
@@ -25,6 +24,9 @@ def index(request, _):
 
 
 def login(request, _):
+    c_openid = None
+    c_appid = None
+    c = None
 
     #需要使用post，才会附加所需要的用户标识等信息
     if request.method == 'POST' or request.method == 'post':
@@ -32,16 +34,30 @@ def login(request, _):
         body = json.loads(body_unicode)
         
         #获取OpenID，使用post数据的原因是便于本地调试
-        if body["openid"] is None :
-            openid = request.META["HTTP_X_WX_OPENID"]
+        if "openid"  in body.keys() :
+            c_openid =  body["openid"]
         else: 
-            openid =  body["nickName"]
+            c_openid = request.META["HTTP_X_WX_OPENID"]
         #获取AppID
-        appid = request.META["HTTP_X_WX_APPID"]
+        if "appid"  in body.keys() :
+            c_appid =  body["appid"]
+        else: 
+            c_appid = request.META["HTTP_X_WX_APPID"]
         #获取昵称，数据来自小程序
-        nickName = body["nickName"]
+        c_nickName = body["nickName"]
         
-        return HttpResponse(openid + "|" + appid + "|" + nickName, status=200)
+        #确认用户是否已经存在
+        #如果不存在就创建新用户
+        cUser = Users.objects.filter(openId = c_openid)
+        if not cUser.exists():
+            Users.objects.create(openId = c_openid,nickName = c_nickName)
+        
+        #获取当前登陆用户
+        cUser = Users.objects.get(openId = c_openid)
+
+        logger.info(cUser.nickName + ' login on ' + datetime.now().strftime("%m/%d/%Y, %H:%M:%S") + ' and realName is ' + cUser.realName)
+        return JsonResponse({'realName': cUser.realName, "isEmployee": cUser.isEmployee})
+        # return HttpResponse(cUser.openId + "|" + cUser.nickName + "|" + cUser.realName, status=200)
     else:
         return HttpResponse("Error call method.", status=200)
 
