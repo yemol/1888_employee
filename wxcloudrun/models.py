@@ -2,27 +2,13 @@
 Author: yemol yemol_yuan@hotmail.com
 Date: 2022-09-24 11:49:55
 LastEditors: yemol yemol_yuan@hotmail.com
-LastEditTime: 2022-09-28 01:18:56
+LastEditTime: 2022-09-28 13:08:20
 FilePath: /1888_employee/wxcloudrun/models.py
 '''
 
 from datetime import datetime
 
 from django.db import models
-
-
-# Create your models here.
-class Counters(models.Model):
-    id = models.AutoField
-    count = models.IntegerField(max_length=11, default=0)
-    createdAt = models.DateTimeField(default=datetime.now(), )
-    updatedAt = models.DateTimeField(default=datetime.now(),)
-
-    def __str__(self):
-        return self.title
-
-    class Meta:
-        db_table = 'Counters'  # 数据库表名
 
 
 class Users(models.Model):
@@ -56,8 +42,8 @@ class Roles(models.Model):
 
 class Schedule(models.Model):
     id = models.AutoField
-    userId = models.IntegerField(default=-1)
-    roleID = models.IntegerField(default=-1)
+    userId = models.ForeignKey('Users', on_delete=models.SET_NULL, null=True)
+    roleID = models.ForeignKey('Roles', on_delete=models.SET_NULL, null=True)
     isTest = models.BooleanField(default=False)
     year = models.IntegerField(null=True)
     month = models.IntegerField(null=True)

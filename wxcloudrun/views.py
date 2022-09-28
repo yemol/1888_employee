@@ -8,9 +8,9 @@ import requests
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.http import HttpResponse 
-from wxcloudrun.models import Counters, Schedule
 from wxcloudrun.models import Users
-from wxcloudrun.models import Schedule
+from wxcloudrun.models import Schedule, Roles
+from django.core import serializers
 
 logger = logging.getLogger('log')
 
@@ -86,88 +86,28 @@ def regRole(request, _):
 
         #获取当前登陆用户
         cUser = Users.objects.get(openId = c_openid)
+        cRole = Roles.objects.get(id = roleID)
 
         #对登记者身份进行合法性检查
         if not cUser.isActor:
              return JsonResponse({'message': "只有演员才能登记演出信息。"} , status=200)
 
         #更新演出信息
-        sItem = Schedule.objects.filter(userId = cUser.id, year = now.year, month = now.month, day = now.day)
+        sItem = Schedule.objects.filter(userId = cUser, year = now.year, month = now.month, day = now.day)
         logger.info(cUser.realName + ' 登记今天出演[角色' + str(roleID) + ']跟场状态为[' + str(isTest) + "]")
         if not sItem.exists():
-            Schedule.objects.create(userId = cUser.id, roleID = roleID, isTest = isTest, year = now.year, month = now.month, day = now.day)
+            Schedule.objects.create(userId = cUser, roleID = cRole, isTest = isTest, year = now.year, month = now.month, day = now.day)
             return JsonResponse({'message': "演出信息已经登记。"} , status=200)
         else:
-            sItem.update(roleID = roleID, isTest = isTest, )
+            sItem.update(roleID = cRole, isTest = isTest, )
             return JsonResponse({'message': "演出信息已经更新。"} , status=200)
 
 
-def counter(request, _):
-    """
-    获取当前计数
-
-     `` request `` 请求对象
-    """
-
-    rsp = JsonResponse({'code': 0, 'errorMsg': ''}, json_dumps_params={'ensure_ascii': False})
-    if request.method == 'GET' or request.method == 'get':
-        rsp = get_count()
-    elif request.method == 'POST' or request.method == 'post':
-        rsp = update_count(request)
-    else:
-        rsp = JsonResponse({'code': -1, 'errorMsg': '请求方式错误'},
-                            json_dumps_params={'ensure_ascii': False})
-    logger.info('response result: {}'.format(rsp.content.decode('utf-8')))
-    return rsp
-
-def get_count():
-    """
-    获取当前计数
-    """
-
-    try:
-        data = Counters.objects.get(id=1)
-    except Counters.DoesNotExist:
-        return JsonResponse({'code': 0, 'data': 0},
-                    json_dumps_params={'ensure_ascii': False})
-    return JsonResponse({'code': 0, 'data': data.count},
-                        json_dumps_params={'ensure_ascii': False})
-
-
-def update_count(request):
-    """
-    更新计数，自增或者清零
-
-    `` request `` 请求对象
-    """
-
-    logger.info('update_count req: {}'.format(request.body))
-
-    body_unicode = request.body.decode('utf-8')
-    body = json.loads(body_unicode)
-
-    if 'action' not in body:
-        return JsonResponse({'code': -1, 'errorMsg': '缺少action参数'},
-                            json_dumps_params={'ensure_ascii': False})
-
-    if body['action'] == 'inc':
-        try:
-            data = Counters.objects.get(id=1)
-        except Counters.DoesNotExist:
-            data = Counters()
-        data.id = 1
-        data.count += 1
-        data.save()
-        return JsonResponse({'code': 0, "data": data.count},
-                    json_dumps_params={'ensure_ascii': False})
-    elif body['action'] == 'clear':
-        try:
-            data = Counters.objects.get(id=1)
-            data.delete()
-        except Counters.DoesNotExist:
-            logger.info('record not exist')
-        return JsonResponse({'code': 0, 'data': 0},
-                    json_dumps_params={'ensure_ascii': False})
-    else:
-        return JsonResponse({'code': -1, 'errorMsg': 'action参数错误'},
-                    json_dumps_params={'ensure_ascii': False})
+def getTodaySchedule(request, _):
+    now = datetime.now()
+    result = []
+    
+    #根据日期获取今日演员排班列表
+    for item in Schedule.objects.filter(year = now.year, month = now.month, day = now.day):
+        result.append({"actor":item.userId.realName, "role": item.roleID.roleName, "isTest": item.isTest})
+    return JsonResponse(json.dumps(result) , status=200, safe=False)
