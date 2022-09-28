@@ -93,7 +93,7 @@ def regRole(request, _):
 
         #更新演出信息
         sItem = Schedule.objects.filter(userId = cUser.id, year = now.year, month = now.month, day = now.day)
-        logger.info(cUser.nickName + ' 登记今天出演[角色' + roleID + ']跟场状态为[' + isTest + "]")
+        logger.info(cUser.realName + ' 登记今天出演[角色' + str(roleID) + ']跟场状态为[' + str(isTest) + "]")
         if not sItem.exists():
             Schedule.objects.create(userId = cUser.id, roleID = roleID, isTest = isTest, year = now.year, month = now.month, day = now.day)
             return JsonResponse({'message': "演出信息已经登记。"} , status=200)
