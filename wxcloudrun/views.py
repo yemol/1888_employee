@@ -2,13 +2,15 @@
 from datetime import datetime
 import json
 import logging
+from signal import SIGTERM
 import requests
 
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.http import HttpResponse 
-from wxcloudrun.models import Counters
+from wxcloudrun.models import Counters, Schedule
 from wxcloudrun.models import Users
+from wxcloudrun.models import Schedule
 
 logger = logging.getLogger('log')
 
@@ -56,10 +58,47 @@ def login(request, _):
         cUser = Users.objects.get(openId = c_openid)
 
         logger.info(cUser.nickName + ' login on ' + datetime.now().strftime("%m/%d/%Y, %H:%M:%S") + ' and realName is ' + cUser.realName)
-        return JsonResponse({'realName': cUser.realName, "isEmployee": cUser.isEmployee})
-        # return HttpResponse(cUser.openId + "|" + cUser.nickName + "|" + cUser.realName, status=200)
+        return JsonResponse({'realName': cUser.realName, "isEmployee": cUser.isEmployee, "isActor": cUser.isActor})
     else:
         return HttpResponse("Error call method.", status=200)
+
+
+
+def regRole(request, _):
+    now = datetime.now()
+    roleID = None
+    isTest = False
+
+    #需要使用post，才会附加所需要的用户标识等信息
+    if request.method == 'POST' or request.method == 'post':
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+
+        #获取OpenID，使用post数据的原因是便于本地调试
+        if "openid"  in body.keys() :
+            c_openid =  body["openid"]
+        else: 
+            c_openid = request.META["HTTP_X_WX_OPENID"]
+
+        #获得演出相关信息
+        roleID = body["roleID"]
+        isTest = body["isTest"] == 1
+
+        #获取当前登陆用户
+        cUser = Users.objects.get(openId = c_openid)
+
+        #对登记者身份进行合法性检查
+        if not cUser.isActor:
+             return HttpResponse("只有演员才能登记演出信息。", status=200)
+
+        #更新演出信息
+        sItem = Schedule.objects.filter(userId = cUser.id, year = now.year, month = now.month, day = now.day)
+        if not sItem.exists():
+            Schedule.objects.create(userId = cUser.id, roleID = roleID, isTest = isTest, year = now.year, month = now.month, day = now.day)
+            return HttpResponse("演出信息已经登记。", status=200)
+        else:
+            sItem.update(roleID = roleID, isTest = isTest, )
+            return HttpResponse("演出信息已经更新。", status=200)
 
 
 def counter(request, _):
@@ -79,7 +118,6 @@ def counter(request, _):
                             json_dumps_params={'ensure_ascii': False})
     logger.info('response result: {}'.format(rsp.content.decode('utf-8')))
     return rsp
-
 
 def get_count():
     """
