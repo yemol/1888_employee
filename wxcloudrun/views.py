@@ -89,16 +89,17 @@ def regRole(request, _):
 
         #对登记者身份进行合法性检查
         if not cUser.isActor:
-             return HttpResponse("只有演员才能登记演出信息。", status=200)
+             return JsonResponse({'message': "只有演员才能登记演出信息。"} , status=200)
 
         #更新演出信息
         sItem = Schedule.objects.filter(userId = cUser.id, year = now.year, month = now.month, day = now.day)
+        logger.info(cUser.nickName + ' 登记今天出演[角色' + roleID + ']跟场状态为[' + isTest + "]")
         if not sItem.exists():
             Schedule.objects.create(userId = cUser.id, roleID = roleID, isTest = isTest, year = now.year, month = now.month, day = now.day)
-            return HttpResponse("演出信息已经登记。", status=200)
+            return JsonResponse({'message': "演出信息已经登记。"} , status=200)
         else:
             sItem.update(roleID = roleID, isTest = isTest, )
-            return HttpResponse("演出信息已经更新。", status=200)
+            return JsonResponse({'message': "演出信息已经更新。"} , status=200)
 
 
 def counter(request, _):
