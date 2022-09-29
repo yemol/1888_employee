@@ -2,7 +2,7 @@
 Author: yemol yemol_yuan@hotmail.com
 Date: 2022-09-24 11:49:55
 LastEditors: yemol yemol_yuan@hotmail.com
-LastEditTime: 2022-09-28 13:08:20
+LastEditTime: 2022-09-29 12:32:35
 FilePath: /1888_employee/wxcloudrun/models.py
 '''
 
@@ -14,7 +14,7 @@ from django.db import models
 class Users(models.Model):
     id = models.AutoField
     openId = models.CharField(max_length=64)
-    nickName = models.CharField(max_length=256)
+    nickName = models.CharField(max_length=256,default="")
     realName = models.CharField(max_length=64)
     phoneNum = models.CharField(max_length=64, null=True)
     isEmployee = models.BooleanField(default=False, null=True)

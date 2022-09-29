@@ -27,8 +27,6 @@ def index(request, _):
 
 def login(request, _):
     c_openid = None
-    c_appid = None
-    c = None
 
     #需要使用post，才会附加所需要的用户标识等信息
     if request.method == 'POST' or request.method == 'post':
@@ -40,28 +38,42 @@ def login(request, _):
             c_openid =  body["openid"]
         else: 
             c_openid = request.META["HTTP_X_WX_OPENID"]
-        #获取AppID
-        if "appid"  in body.keys() :
-            c_appid =  body["appid"]
-        else: 
-            c_appid = request.META["HTTP_X_WX_APPID"]
-        #获取昵称，数据来自小程序
-        c_nickName = body["nickName"]
+
         
         #确认用户是否已经存在
         #如果不存在就创建新用户
         cUser = Users.objects.filter(openId = c_openid)
         if not cUser.exists():
-            Users.objects.create(openId = c_openid,nickName = c_nickName)
+            Users.objects.create(openId = c_openid)
         
         #获取当前登陆用户
         cUser = Users.objects.get(openId = c_openid)
 
         logger.info(cUser.nickName + ' login on ' + datetime.now().strftime("%m/%d/%Y, %H:%M:%S") + ' and realName is ' + cUser.realName)
-        return JsonResponse({'realName': cUser.realName, "isEmployee": cUser.isEmployee, "isActor": cUser.isActor})
+        return JsonResponse({'nickName': cUser.nickName, 'realName': cUser.realName, "isEmployee": cUser.isEmployee, "isActor": cUser.isActor})
     else:
         return HttpResponse("Error call method.", status=200)
 
+
+def updateNickName(request, _):
+    c_openid = None
+    c_nickName = None
+
+    #获取昵称，数据来自小程序
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+    c_nickName = body["nickName"]
+
+    #获取OpenID，使用post数据的原因是便于本地调试
+    if "openid"  in body.keys() :
+        c_openid =  body["openid"]
+    else: 
+        c_openid = request.META["HTTP_X_WX_OPENID"]
+
+    #获取当前登陆用户
+    cUser = Users.objects.filter(openId = c_openid)
+    cUser.update(nickName = c_nickName)
+    return HttpResponse("", status=200)
 
 
 def regRole(request, _):
