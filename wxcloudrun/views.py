@@ -122,4 +122,4 @@ def getTodaySchedule(request, _):
     #根据日期获取今日演员排班列表
     for item in Schedule.objects.filter(year = now.year, month = now.month, day = now.day):
         result.append({"actor":item.userId.realName, "role": item.roleID.roleName, "isTest": item.isTest})
-    return JsonResponse(json.dumps(result) , status=200, safe=False)
+    return JsonResponse(result, status=200, safe=False)
