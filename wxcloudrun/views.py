@@ -52,7 +52,7 @@ def login(request, _):
         logger.info(cUser.nickName + ' login on ' + datetime.now().strftime("%m/%d/%Y, %H:%M:%S") + ' and realName is ' + cUser.realName)
         return JsonResponse({'nickName': cUser.nickName, 'realName': cUser.realName, "isEmployee": cUser.isEmployee, "isActor": cUser.isActor})
     else:
-        return HttpResponse("Error call method.", status=200)
+        return JsonResponse({'message': "Error"})
 
 
 def updateNickName(request, _):
@@ -73,7 +73,7 @@ def updateNickName(request, _):
     #获取当前登陆用户
     cUser = Users.objects.filter(openId = c_openid)
     cUser.update(nickName = c_nickName)
-    return HttpResponse("", status=200)
+    return JsonResponse({'message': "updated"})
 
 
 def regRole(request, _):
