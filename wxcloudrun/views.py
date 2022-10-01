@@ -123,3 +123,25 @@ def getTodaySchedule(request, _):
     for item in Schedule.objects.filter(year = now.year, month = now.month, day = now.day):
         result.append({"actor":item.userId.realName, "role": item.roleID.roleName, "isTest": item.isTest})
     return JsonResponse(result, status=200, safe=False)
+
+
+def myAttendance(request, _):
+    result = []
+    c_openid = None
+
+    if request.method == 'POST' or request.method == 'post':
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+
+        #获取OpenID，使用post数据的原因是便于本地调试
+        if "openid"  in body.keys() :
+            c_openid =  body["openid"]
+        else: 
+            c_openid = request.META["HTTP_X_WX_OPENID"]
+        
+        #根据某个演员的最近90天考勤记录
+        for item in Schedule.objects.filter(userId__openId = c_openid).order_by('-createdAt')[:90]:
+            result.append(str(item.year) + "-" + str(item.month) + "-" + str(item.day))
+        return JsonResponse(result, status=200, safe=False)
+    else:
+        return JsonResponse({'message': "Plese send request in POST method"})
