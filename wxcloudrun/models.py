@@ -2,7 +2,7 @@
 Author: yemol yemol_yuan@hotmail.com
 Date: 2022-09-24 11:49:55
 LastEditors: yemol yemol_yuan@hotmail.com
-LastEditTime: 2022-09-29 12:32:35
+LastEditTime: 2022-10-02 22:24:01
 FilePath: /1888_employee/wxcloudrun/models.py
 '''
 
@@ -19,8 +19,8 @@ class Users(models.Model):
     phoneNum = models.CharField(max_length=64, null=True)
     isEmployee = models.BooleanField(default=False, null=True)
     isActor = models.BooleanField(default=False, null=True)
-    createdAt = models.DateTimeField(default=datetime.now(), ) 
-    updatedAt = models.DateTimeField(default=datetime.now(),)  
+    createdAt = models.DateTimeField(auto_now_add=True ) 
+    updatedAt = models.DateTimeField(auto_now=True)  
 
     def __str__(self):
         return self.title 
@@ -48,8 +48,8 @@ class Schedule(models.Model):
     year = models.IntegerField(null=True)
     month = models.IntegerField(null=True)
     day = models.IntegerField(null=True)
-    createdAt = models.DateTimeField(default=datetime.now(), )
-    updatedAt = models.DateTimeField(default=datetime.now(),)   
+    createdAt = models.DateTimeField(auto_now_add=True ) 
+    updatedAt = models.DateTimeField(auto_now=True)   
 
     def __str__(self):
         return self.title 
