@@ -3,7 +3,6 @@ from datetime import datetime
 import json
 import logging
 from signal import SIGTERM
-import django
 import requests
 
 from django.http import JsonResponse
@@ -50,7 +49,7 @@ def login(request, _):
         #获取当前登陆用户
         cUser = Users.objects.get(openId = c_openid)
 
-        logger.info(cUser.nickName + ' login on ' + django.util.timezone.now().strftime("%m/%d/%Y, %H:%M:%S") + ' and realName is ' + cUser.realName)
+        logger.info(cUser.nickName + ' login on ' + datetime.now().strftime("%m/%d/%Y, %H:%M:%S") + ' and realName is ' + cUser.realName)
         return JsonResponse({'nickName': cUser.nickName, 'realName': cUser.realName, "isEmployee": cUser.isEmployee, "isActor": cUser.isActor})
     else:
         return JsonResponse({'message': "Error"})
