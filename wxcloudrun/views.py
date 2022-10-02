@@ -1,5 +1,5 @@
 
-from datetime import datetime
+import datetime
 import json
 import logging
 from signal import SIGTERM
@@ -50,16 +50,7 @@ def login(request, _):
         #获取当前登陆用户
         cUser = Users.objects.get(openId = c_openid)
 
-        os.environ['TZ'] = 'Asia/Shanghai'
-        offset = time.timezone
-        logger.info(offset)
-
-        tt = time.localtime()
-        current_time = time.strftime("%H:%M:%S", tt)
-        logger.info(current_time)
-
-
-        logger.info(cUser.nickName + ' login on ' + datetime.now().strftime("%m/%d/%Y, %H:%M:%S") + ' and realName is ' + cUser.realName)
+        logger.info(cUser.nickName + ' login on ' + datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S") + ' and realName is ' + cUser.realName)
         return JsonResponse({'nickName': cUser.nickName, 'realName': cUser.realName, "isEmployee": cUser.isEmployee, "isActor": cUser.isActor})
     else:
         return JsonResponse({'message': "Error"})
@@ -87,7 +78,8 @@ def updateNickName(request, _):
 
 
 def regRole(request, _):
-    now = datetime.now()
+    # 因为系统问题，我们必须手动增加8小时
+    now = datetime.datetime.now() + datetime.timedelta(hours = 8)
     roleID = None
     isTest = False
 
@@ -126,7 +118,8 @@ def regRole(request, _):
 
 
 def getTodaySchedule(request, _):
-    now = datetime.now()
+    # 因为系统问题，我们必须手动增加8小时
+    now = datetime.datetime.now() + datetime.timedelta(hours = 8)
     result = []
     
     #根据日期获取今日演员排班列表
