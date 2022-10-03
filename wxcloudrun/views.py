@@ -155,7 +155,7 @@ def getTodayCovids(request, _):
     #根据日期获取今日演员排班列表
     logger.info(now.strftime("%m/%d/%Y, %H:%M:%S") + " 尝试获取当日核酸检查数据")
     for item in Covids.objects.filter(year = now.year, month = now.month, day = now.day):
-        result.append({"actor":item.userId.realName, "startTemperature": item.startTemperature, "endTemperature": item.endTemperature, "checkedIn24Hours": item.checkedIn24Hours})
+        result.append({"actor":item.user.realName, "startTemperature": item.startTemperature, "endTemperature": item.endTemperature, "checkedIn24Hours": item.checkedIn24Hours})
     return JsonResponse(result, status=200, safe=False)
 
 
