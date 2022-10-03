@@ -2,7 +2,7 @@
 Author: yemol yemol_yuan@hotmail.com
 Date: 2022-09-24 11:49:55
 LastEditors: yemol yemol_yuan@hotmail.com
-LastEditTime: 2022-10-02 22:24:01
+LastEditTime: 2022-10-03 22:58:08
 FilePath: /1888_employee/wxcloudrun/models.py
 '''
 
@@ -56,3 +56,22 @@ class Schedule(models.Model):
 
     class Meta:
         db_table = 'Schedule'  # 数据库表名
+
+
+class Covids(models.Model):
+    id = models.AutoField
+    user = models.ForeignKey('Users', on_delete=models.SET_NULL, null=True)
+    checkedIn24Hours = models.BooleanField(default=False)
+    startTemperature = models.DecimalField(null=True, max_digits=3, decimal_places=1)
+    endTemperature = models.DecimalField(null=True, max_digits=3, decimal_places=1)
+    year = models.IntegerField(null=True)
+    month = models.IntegerField(null=True)
+    day = models.IntegerField(null=True)
+    createdAt = models.DateTimeField(auto_now_add=True ) 
+    updatedAt = models.DateTimeField(auto_now=True)   
+
+    def __str__(self):
+        return self.title 
+
+    class Meta:
+        db_table = 'Covids'  # 数据库表名
